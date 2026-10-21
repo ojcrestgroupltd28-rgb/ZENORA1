@@ -1237,5 +1237,102 @@
       renderReports();
     }
   });
+// ZENORA administrator authentication
+const zenoraLogin = document.getElementById("zenoraLogin");
+const zenoraLoginForm = document.getElementById("zenoraLoginForm");
+const zenoraLoginEmail = document.getElementById("zenoraLoginEmail");
+const zenoraLoginPassword = document.getElementById("zenoraLoginPassword");
+const zenoraLoginMessage = document.getElementById("zenoraLoginMessage");
+const zenoraAdminShell = document.querySelector(".admin-shell");
 
+function showZenoraLogin(message = "") {
+if (zenoraLogin) {
+zenoraLogin.style.display = "flex";
+}
+
+if (zenoraAdminShell) {
+zenoraAdminShell.style.display = "none";
+}
+
+if (zenoraLoginMessage) {
+zenoraLoginMessage.textContent = message;
+}
+}
+
+function showZenoraDashboard() {
+if (zenoraLogin) {
+zenoraLogin.style.display = "none";
+}
+
+if (zenoraAdminShell) {
+zenoraAdminShell.style.display = "";
+}
+}
+
+if (zenoraLoginForm) {
+zenoraLoginForm.addEventListener("submit", async (event) => {
+event.preventDefault();
+
+const email = zenoraLoginEmail.value.trim();
+const password = zenoraLoginPassword.value;
+
+if (zenoraLoginMessage) {
+  zenoraLoginMessage.textContent = "Signing in...";
+}
+
+try {
+  const client = await supabaseReady;
+
+  if (!client) {
+    throw new Error("Supabase is not configured.");
+  }
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.session) {
+    throw new Error("Sign-in did not create a session. Please try again.");
+  }
+
+  zenoraLoginPassword.value = "";
+  showZenoraDashboard();
+} catch (error) {
+  showZenoraLogin(
+    error.message || "Sign-in failed. Please check your details."
+  );
+}
+
+});
+}
+
+// Check whether an administrator is already signed in.
+showZenoraLogin();
+
+supabaseReady
+.then(async (client) => {
+const { data, error } = await client.auth.getSession();
+
+if (error) {
+  showZenoraLogin("Unable to check your session. Please sign in again.");
+  return;
+}
+
+if (data.session) {
+  showZenoraDashboard();
+} else {
+  showZenoraLogin();
+}
+
+})
+.catch(() => {
+showZenoraLogin(
+"Could not connect to Supabase. Check your configuration and internet connection."
+);
+});
 })();
