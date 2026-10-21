@@ -25,7 +25,94 @@ function csvDownload(filename,rows){const csv=rows.map(row=>row.map(v=>`"${Strin
 $$(".side-link").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));$$("[data-goto]").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.goto)));
 $("#quickAddProduct").addEventListener("click",()=>{switchTab("products");openEditor()});$("#addProductButton").addEventListener("click",()=>openEditor());$("#adminProductSearch").addEventListener("input",renderProducts);$("#adminProductCategory").addEventListener("change",renderProducts);$("#orderSearch").addEventListener("input",renderOrders);$("#orderStatusFilter").addEventListener("change",renderOrders);
 $("#adminProductsTable").addEventListener("click",e=>{const edit=e.target.closest("[data-edit]");if(edit){openEditor(state.products.find(p=>p.id===edit.dataset.edit));return}const del=e.target.closest("[data-delete]");if(del){const p=state.products.find(p=>p.id===del.dataset.delete);if(p&&confirm(`Delete "${p.name}" from this browser's catalogue?`)){state.products=state.products.filter(x=>x.id!==p.id);persist();renderProducts();renderOverview();toast("Product deleted.")}}});
-$("#productForm").addEventListener("submit",e=>{e.preventDefault();const id=$("#editProductId").value||"z"+Date.now().toString(36);const old=state.products.find(p=>p.id===id);const p={id,name:$("#productName").value.trim(),category:$("#productCategory").value,price:Number($("#productPrice").value),oldPrice:Number($("#productOldPrice").value||0),stock:Number($("#productStock").value),image:$("#productImage").value.trim(),description:$("#productDescription").value.trim(),specs:$("#productSpecs").value.split("\n").map(x=>x.trim()).filter(Boolean),featured:$("#productFeatured").checked,isNew:$("#productNew").checked,brand:old?.brand||"ZENORA SELECT",rating:old?.rating||0,reviews:old?.reviews||0};if(old)state.products=state.products.map(x=>x.id===id?p:x);else state.products.unshift(p);persist();closeEditor();renderProducts();renderOverview();renderReports();toast(old?"Product updated.":"Product added.");});
+// Save ZENORA products and upload selected images
+$("#productForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const submitButton = e.submitter;
+
+  try {
+    if (submitButton) submitButton.disabled = true;
+
+    const id =
+      $("#editProductId").value ||
+      "z" + Date.now().toString(36);
+
+    const old = state.products.find(p => p.id === id);
+
+    // Keep the existing image unless a new image is selected.
+    let imageUrl = $("#productImage").value.trim();
+
+    // Upload a newly selected image to Supabase.
+    if (selectedProductImage) {
+      imageStatus.textContent = "Uploading product image...";
+
+      imageUrl = await uploadZenoraProductImage(
+        selectedProductImage
+      );
+
+      $("#productImage").value = imageUrl;
+
+      imagePreview.src = imageUrl;
+      imagePreview.style.display = "block";
+
+      imageStatus.textContent = "Image uploaded successfully.";
+    }
+
+    const product = {
+      id,
+      name: $("#productName").value.trim(),
+      category: $("#productCategory").value,
+      price: Number($("#productPrice").value),
+      oldPrice: Number($("#productOldPrice").value || 0),
+      stock: Number($("#productStock").value),
+      image: imageUrl,
+      description: $("#productDescription").value.trim(),
+      specs: $("#productSpecs").value
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean),
+      featured: $("#productFeatured").checked,
+      isNew: $("#productNew").checked,
+      brand: old?.brand || "ZENORA SELECT",
+      rating: old?.rating || 0,
+      reviews: old?.reviews || 0
+    };
+
+    if (old) {
+      state.products = state.products.map(p =>
+        p.id === id ? product : p
+      );
+    } else {
+      state.products.unshift(product);
+    }
+
+    // Save to this browser's local storage.
+    persist();
+
+    // Clear the selected file after successful saving.
+    selectedProductImage = null;
+    imageFileInput.value = "";
+
+    closeEditor();
+    renderProducts();
+    renderOverview();
+    renderReports();
+
+    toast(old ? "Product updated." : "Product added.");
+
+  } catch (error) {
+    console.error("ZENORA product save error:", error);
+
+    imageStatus.textContent =
+      error.message || "Something went wrong. Please try again.";
+
+    toast(error.message || "Could not save the product.");
+
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
+});const id=$("#editProductId").value||"z"+Date.now().toString(36);const old=state.products.find(p=>p.id===id);const p={id,name:$("#productName").value.trim(),category:$("#productCategory").value,price:Number($("#productPrice").value),oldPrice:Number($("#productOldPrice").value||0),stock:Number($("#productStock").value),image:$("#productImage").value.trim(),description:$("#productDescription").value.trim(),specs:$("#productSpecs").value.split("\n").map(x=>x.trim()).filter(Boolean),featured:$("#productFeatured").checked,isNew:$("#productNew").checked,brand:old?.brand||"ZENORA SELECT",rating:old?.rating||0,reviews:old?.reviews||0};if(old)state.products=state.products.map(x=>x.id===id?p:x);else state.products.unshift(p);persist();closeEditor();renderProducts();renderOverview();renderReports();toast(old?"Product updated.":"Product added.");});
 $$("[data-close]").forEach(b=>b.addEventListener("click",closeEditor));
 $("#categoryForm").addEventListener("submit",e=>{e.preventDefault();const c=$("#newCategory").value.trim();if(!c)return;if(state.categories.some(x=>x.toLowerCase()===c.toLowerCase())){toast("That category already exists.");return}state.categories.push(c);persist();$("#newCategory").value="";renderCategories();toast("Category added.")});
 $("#categoryList").addEventListener("click",e=>{const b=e.target.closest("[data-remove-category]");if(!b)return;const c=b.dataset.removeCategory;if(state.products.some(p=>p.category===c)){toast("Move or edit products in this category before removing it.");return}if(confirm(`Remove category "${c}"?`)){state.categories=state.categories.filter(x=>x!==c);persist();renderCategories();toast("Category removed.")}});
