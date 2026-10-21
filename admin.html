@@ -22,7 +22,29 @@
 <section class="admin-panel" id="tab-reports"><div class="admin-card"><div class="card-heading"><div><div class="eyebrow">BUSINESS INTELLIGENCE</div><h3>Reports & exports</h3></div></div><div class="report-grid"><div><span>Catalogue value at listed price</span><b id="reportInventoryValue">₦0</b></div><div><span>Average demo order value</span><b id="reportAverageOrder">₦0</b></div><div><span>Units in stock</span><b id="reportUnits">0</b></div><div><span>Demo orders delivered</span><b id="reportDelivered">0</b></div></div><button class="button button-gold" id="exportProducts">EXPORT PRODUCTS CSV ↓</button><p class="small-note">These are browser-local demo metrics, not audited financial reports. Profit requires costs, fees, refunds and expenses.</p></div></section>
 </main></div>
 
-<div class="modal" id="productEditor" role="dialog" aria-modal="true" aria-label="Product editor"><button class="modal-close" data-close="productEditor">×</button><div class="eyebrow">CATALOGUE EDITOR</div><h2 id="productEditorTitle">Add product</h2><form id="productForm" class="form-stack"><input id="editProductId" type="hidden"><label>Product name<input id="productName" required maxlength="120"></label><div class="form-two"><label>Price (₦)<input id="productPrice" type="number" min="0" step="1" required></label><label>Previous price (₦)<input id="productOldPrice" type="number" min="0" step="1"></label></div><div class="form-two"><label>Category<select id="productCategory" required></select></label><label>Stock quantity<input id="productStock" type="number" min="0" step="1" required></label></div><label>Image URL<input id="productImage" type="url" placeholder="https://..."></label><label>Description<textarea id="productDescription" rows="3"></textarea></label><label>Specifications (one per line)<textarea id="productSpecs" rows="3" placeholder="Storage: 128 GB&#10;Warranty: As listed"></textarea></label><div class="form-two checkbox-line"><label><input id="productFeatured" type="checkbox"> Featured product</label><label><input id="productNew" type="checkbox"> New arrival</label></div><button class="button button-gold full-width">SAVE PRODUCT</button></form></div>
+<div class="modal" id="productEditor" role="dialog" aria-modal="true" aria-label="Product editor"><button class="modal-close" data-close="productEditor">×</button><div class="eyebrow">CATALOGUE EDITOR</div><h2 id="productEditorTitle">Add product</h2><form id="productForm" class="form-stack"><input id="editProductId" type="hidden"><label>Product name<input id="productName" required maxlength="120"></label><div class="form-two"><label>Price (₦)<input id="productPrice" type="number" min="0" step="1" required></label><label>Previous price (₦)<input id="productOldPrice" type="number" min="0" step="1"></label></div><div class="form-two"><label>Category<select id="productCategory" required></select></label><label>Stock quantity<input id="productStock" type="number" min="0" step="1" required></label></div><div class="image-upload-section">
+  <label for="productImageFile">Product Image</label>
+
+  <input
+    id="productImageFile"
+    type="file"
+    accept="image/jpeg,image/png,image/webp,image/gif"
+  >
+
+  <div id="productImagePreviewBox" style="margin-top:12px">
+    <img
+      id="productImagePreview"
+      alt="Product image preview"
+      style="display:none;width:150px;height:150px;object-fit:contain;border-radius:10px"
+    >
+  </div>
+
+  <p id="productImageStatus" class="small-note">
+    Choose an image from your phone. Maximum size: 20 MB.
+  </p>
+
+  <input id="productImage" type="hidden">
+</div></label><label>Description<textarea id="productDescription" rows="3"></textarea></label><label>Specifications (one per line)<textarea id="productSpecs" rows="3" placeholder="Storage: 128 GB&#10;Warranty: As listed"></textarea></label><div class="form-two checkbox-line"><label><input id="productFeatured" type="checkbox"> Featured product</label><label><input id="productNew" type="checkbox"> New arrival</label></div><button class="button button-gold full-width">SAVE PRODUCT</button></form></div>
 <div class="toast" id="adminToast" role="status"></div>
 <script src="supabase-config.js"></script><script src="admin.js"></script>
 </body></html>
