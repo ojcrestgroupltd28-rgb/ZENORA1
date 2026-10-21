@@ -3,6 +3,18 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101010"><title>ZENORA Admin Dashboard</title><link rel="stylesheet" href="styles.css"></head>
 <body class="admin-body">
 <header class="admin-topbar"><a class="brand" href="index.html"><img src="assets/zenora-logo.png" alt="ZENORA logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="brand-fallback"><b class="z-mark">Z</b><span>ZENORA<small>ADMINISTRATION</small></span></span></a><div class="admin-top-right"><span class="admin-pill"><i></i> Local demo dashboard</span><a class="button button-outline" href="index.html">VIEW STORE ↗</a></div></header>
+<div id="zenoraLogin" style="display:none;min-height:100vh;background:#101010;color:#f5f0e5;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;">
+  <form id="zenoraLoginForm" style="width:100%;max-width:400px;background:#1b1b1b;border:1px solid #c8a45d;border-radius:14px;padding:28px;box-sizing:border-box;">
+    <h1 style="color:#d6b46a;text-align:center;">ZENORA</h1>
+    <h2 style="text-align:center;">Administrator Sign In</h2>
+    <label for="zenoraLoginEmail">Email address</label>
+    <input id="zenoraLoginEmail" type="email" autocomplete="username" required style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;">
+    <label for="zenoraLoginPassword">Password</label>
+    <input id="zenoraLoginPassword" type="password" autocomplete="current-password" required style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0 18px;">
+    <button type="submit" style="width:100%;padding:13px;background:#d6b46a;color:#101010;border:0;border-radius:6px;font-weight:bold;">Sign In</button>
+    <p id="zenoraLoginMessage" role="status" style="overflow-wrap:anywhere;"></p>
+  </form>
+</div>
 <div class="admin-shell">
 <aside class="admin-sidebar"><div class="eyebrow">WORKSPACE</div><button class="side-link active" data-tab="overview">▦ <span>Overview</span></button><button class="side-link" data-tab="products">▤ <span>Products</span></button><button class="side-link" data-tab="orders">▣ <span>Orders</span></button><button class="side-link" data-tab="categories">◈ <span>Categories</span></button><button class="side-link" data-tab="promotions">✦ <span>Promotions</span></button><button class="side-link" data-tab="customers">♙ <span>Customers</span></button><button class="side-link" data-tab="reports">▥ <span>Reports</span></button><div class="sidebar-note"><b>ZENORA</b><p>Everything You Need.<br>One Destination.</p><small>Starter workspace · v1.0</small></div></aside>
 <main class="admin-main">
