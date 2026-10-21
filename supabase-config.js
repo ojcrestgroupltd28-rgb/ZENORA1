@@ -1,12 +1,11 @@
 /*
-  ZENORA configuration.
-  You may put your Supabase PROJECT URL and publishable/anon key here.
-  NEVER put a Supabase service-role/secret key or Paystack secret key in this file.
-  This starter storefront/admin currently runs in local demo mode until backend
-  integration is implemented. Supabase credentials alone do not secure admin actions.
+  ZENORA Supabase configuration.
+  Use only your project URL and publishable key.
+  Never put secret or service-role keys here.
 */
+
 window.ZENORA_CONFIG = {
-  SUPABASE_URL: "",
-  SUPABASE_ANON_KEY: "",
+  SUPABASE_URL: "https://sxwecbvdtgzlfelkshtv.supabase.co",
+  SUPABASE_ANON_KEY: "YOUR_PUBLISHABLE_KEY_HERE",
   CURRENCY: "NGN"
 };
