@@ -35,4 +35,116 @@ $("#exportOrders").addEventListener("click",()=>csvDownload("zenora-orders.csv",
 $("#exportProducts").addEventListener("click",()=>csvDownload("zenora-products.csv",[["ID","Name","Category","Price NGN","Previous Price NGN","Stock","Featured","New Arrival","Image URL","Description","Specifications"],...state.products.map(p=>[p.id,p.name,p.category,p.price,p.oldPrice,p.stock,p.featured,p.isNew,p.image,p.description,(p.specs||[]).join("; ")])]));
 renderCategoryOptions();renderOverview();renderProducts();renderOrders();renderCategories();renderCustomers();renderReports();
 window.addEventListener("storage",e=>{if(e.key===STORE_KEY||e.key===ORDERS_KEY){state=load();orders=read(ORDERS_KEY,[]);renderCategoryOptions();renderOverview();renderProducts();renderOrders();renderCategories();renderCustomers();renderReports()}});
+// ZENORA product image upload
+const imageFileInput = document.querySelector("#productImageFile");
+const imagePreview = document.querySelector("#productImagePreview");
+const imageStatus = document.querySelector("#productImageStatus");
+
+let zenoraSupabase = null;
+let selectedProductImage = null;
+
+if (window.ZENORA_CONFIG?.SUPABASE_URL &&
+    window.ZENORA_CONFIG?.SUPABASE_ANON_KEY) {
+  const supabaseScript = document.createElement("script");
+  supabaseScript.src =
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+  supabaseScript.onload = () => {
+    zenoraSupabase = window.supabase.createClient(
+      window.ZENORA_CONFIG.SUPABASE_URL,
+      window.ZENORA_CONFIG.SUPABASE_ANON_KEY
+    );
+  };
+
+  supabaseScript.onerror = () => {
+    imageStatus.textContent =
+      "Could not load the image upload service. Refresh and try again.";
+  };
+
+  document.head.appendChild(supabaseScript);
+}
+
+if (imageFileInput) {
+  imageFileInput.addEventListener("change", event => {
+    const file = event.target.files?.[0];
+
+    selectedProductImage = null;
+
+    if (!file) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif"
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      imageStatus.textContent =
+        "Choose a JPG, PNG, WEBP or GIF image.";
+      imageFileInput.value = "";
+      return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      imageStatus.textContent =
+        "Image is too large. Maximum size is 20 MB.";
+      imageFileInput.value = "";
+      return;
+    }
+
+    selectedProductImage = file;
+
+    imagePreview.src = URL.createObjectURL(file);
+    imagePreview.style.display = "block";
+
+    imageStatus.textContent =
+      "Image selected. It will upload when you save the product.";
+  });
+}
+
+async function uploadZenoraProductImage(file) {
+  if (!zenoraSupabase) {
+    throw new Error(
+      "Supabase is still loading. Wait a moment and try again."
+    );
+  }
+
+  const {
+    data: { user },
+    error: authError
+  } = await zenoraSupabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error(
+      "Please sign in to your administrator account before uploading."
+    );
+  }
+
+  const extension = file.name.split(".").pop().toLowerCase();
+  const safeExtension =
+    ["jpg", "jpeg", "png", "webp", "gif"].includes(extension)
+      ? extension
+      : "jpg";
+
+  const filePath =
+    user.id + "/" + Date.now() + "-" +
+    Math.random().toString(36).slice(2) + "." + safeExtension;
+
+  const { error } = await zenoraSupabase.storage
+    .from("zenora-products")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type
+    });
+
+  if (error) throw error;
+
+  const { data } = zenoraSupabase.storage
+    .from("zenora-products")
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
 })();
