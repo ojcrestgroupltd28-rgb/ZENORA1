@@ -6,6 +6,6 @@
 
 window.ZENORA_CONFIG = {
   SUPABASE_URL: "https://sxwecbvdtgzlfelkshtv.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR_PUBLISHABLE_KEY_HERE",
+  SUPABASE_ANON_KEY: "sb_publishable_PwwScP0rODB0OR3y4Q9jAA_tkcFQEIY",
   CURRENCY: "NGN"
 };
