@@ -317,9 +317,37 @@
   let state = load();
   let orders = read(ORDERS_KEY, []);
 
-  function persist() {
-    save(STORE_KEY, state);
+  async function persist() {
+  save(STORE_KEY, state);
+
+  const { error } = await window.zenoraSupabase
+    .from("products")
+    .upsert(
+      state.products.map(product => ({
+        id: String(product.id),
+        name: product.name || "",
+        category: product.category || "",
+        price: Number(product.price) || 0,
+        old_price: Number(product.oldPrice) || 0,
+        stock: Number(product.stock) || 0,
+        image: product.image || "",
+        description: product.description || "",
+        specs: product.specs || [],
+        featured: Boolean(product.featured),
+        is_new: Boolean(product.isNew),
+        brand: product.brand || "ZENORA SELECT",
+        rating: Number(product.rating) || 0,
+        reviews: Number(product.reviews) || 0,
+        updated_at: new Date().toISOString()
+      })),
+      { onConflict: "id" }
+    );
+
+  if (error) {
+    console.error("ZENORA Supabase save error:", error.message);
+    alert("Products were saved locally, but online saving failed: " + error.message);
   }
+        }
 
   function toast(message) {
     const element = $("#adminToast");
