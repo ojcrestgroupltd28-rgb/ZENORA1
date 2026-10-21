@@ -784,7 +784,7 @@
             throw new Error("Supabase library did not initialise.");
           }
 
-          zenoraSupabase = window.supabase.createClient(
+          window.zenoraSupabase = window.supabase.createClient(
             window.ZENORA_CONFIG.SUPABASE_URL,
             window.ZENORA_CONFIG.SUPABASE_ANON_KEY
           );
