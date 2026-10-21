@@ -760,7 +760,7 @@
     supabaseReady = new Promise((resolve, reject) => {
       if (window.supabase?.createClient) {
         try {
-          zenoraSupabase = window.supabase.createClient(
+          window.zenoraSupabase = window.supabase.createClient(
             window.ZENORA_CONFIG.SUPABASE_URL,
             window.ZENORA_CONFIG.SUPABASE_ANON_KEY
           );
