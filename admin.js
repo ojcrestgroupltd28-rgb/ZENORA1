@@ -765,7 +765,7 @@
             window.ZENORA_CONFIG.SUPABASE_ANON_KEY
           );
 
-          resolve(zenoraSupabase);
+          resolve(window.zenoraSupabase);
         } catch (error) {
           reject(error);
         }
